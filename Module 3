@@ -1,0 +1,72 @@
+#Data visualization
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
+plt.show()
+
+#class imabalnce analysis
+from imblearn.over_sampling import SMOTE
+smote = SMOTE(random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
+
+#Baseline model
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, roc_auc_score
+
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print(classification_report(y_test, y_pred_lr))
+print("ROC-AUC:", roc_auc_score(y_test, y_pred_lr))
+
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X_train, y_train)
+y_pred_rf = rf.predict(X_test)
+print(classification_report(y_test, y_pred_rf))
+print("ROC-AUC:", roc_auc_score(y_test, y_pred_rf))
+
+#Gradient boosting
+from xgboost import XGBClassifier
+
+xgb = XGBClassifier(random_state=42)
+xgb.fit(X_train, y_train)
+y_pred_xgb = xgb.predict(X_test)
+print(classification_report(y_test, y_pred_xgb))
+print("ROC-AUC:", roc_auc_score(y_test, y_pred_xgb))
+
+#Deep Learning for Image Data
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
+    MaxPooling2D(pool_size=(2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+
+# Model Evaluation
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_rf))
+print("Accuracy:", accuracy_score(y_test, y_pred_rf))
+print("Precision:", precision_score(y_test, y_pred_rf))
+print("Recall:", recall_score(y_test, y_pred_rf))
+
+#Model Optimization
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {'n_estimators': [50, 100, 150], 'max_depth': [10, 20, 30]}
+grid = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, cv=3)
+grid.fit(X_train, y_train)
+print("Best Parameters:", grid.best_params_)
+
